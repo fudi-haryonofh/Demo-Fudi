@@ -1,0 +1,135 @@
+// Data produk statis
+const products = [
+  {
+    id: 1,
+    name: "Sepatu Sneakers",
+    price: 350000,
+    image: "https://via.placeholder.com/200?text=Sneakers"
+  },
+  {
+    id: 2,
+    name: "Kaos Polos",
+    price: 120000,
+    image: "https://via.placeholder.com/200?text=Kaos+Polos"
+  },
+  {
+    id: 3,
+    name: "Tas Ransel",
+    price: 450000,
+    image: "https://via.placeholder.com/200?text=Tas+Ransel"
+  }
+];
+
+// Fungsi format harga
+function formatPrice(num) {
+  return "Rp " + num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+// Keranjang disimpan di localStorage
+function getCart() {
+  return JSON.parse(localStorage.getItem("cart")) || [];
+}
+
+function saveCart(cart) {
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+function addToCart(productId) {
+  const cart = getCart();
+  const productInCart = cart.find(item => item.id === productId);
+
+  if (productInCart) {
+    productInCart.qty++;
+  } else {
+    cart.push({ id: productId, qty: 1 });
+  }
+
+  saveCart(cart);
+  updateCartCount();
+  alert("Produk berhasil ditambahkan ke keranjang!");
+}
+
+function updateCartCount() {
+  const cart = getCart();
+  const count = cart.reduce((acc, item) => acc + item.qty, 0);
+  const cartCountElem = document.getElementById("cart-count");
+  if (cartCountElem) {
+    cartCountElem.textContent = count;
+  }
+}
+
+// Render halaman produk
+function renderProducts() {
+  const container = document.getElementById("products");
+  if (!container) return;
+
+  container.innerHTML = "";
+  products.forEach(p => {
+    const div = document.createElement("div");
+    div.className = "product";
+    div.innerHTML = `
+      <img src="${p.image}" alt="${p.name}" />
+      <h3>${p.name}</h3>
+      <p>${formatPrice(p.price)}</p>
+      <button onclick="addToCart(${p.id})">Tambah ke Keranjang</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// Render halaman keranjang
+function renderCart() {
+  const container = document.getElementById("cart-items");
+  const totalElem = document.getElementById("cart-total");
+  if (!container || !totalElem) return;
+
+  const cart = getCart();
+  if (cart.length === 0) {
+    container.innerHTML = "<p>Keranjang kosong.</p>";
+    totalElem.textContent = "";
+    return;
+  }
+
+  container.innerHTML = "";
+  let total = 0;
+
+  cart.forEach(item => {
+    const product = products.find(p => p.id === item.id);
+    if (!product) return;
+
+    const subTotal = product.price * item.qty;
+    total += subTotal;
+
+    const div = document.createElement("div");
+    div.className = "cart-item";
+    div.innerHTML = `
+      <span>${product.name} x ${item.qty}</span>
+      <span>${formatPrice(subTotal)}</span>
+    `;
+    container.appendChild(div);
+  });
+
+  totalElem.textContent = "Total: " + formatPrice(total);
+}
+
+function clearCart() {
+  localStorage.removeItem("cart");
+  renderCart();
+  updateCartCount();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateCartCount();
+  renderProducts();
+
+  const clearBtn = document.getElementById("clear-cart");
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      if (confirm("Apakah Anda yakin ingin mengosongkan keranjang?")) {
+        clearCart();
+      }
+    });
+  }
+
+  renderCart();
+});
