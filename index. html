@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>E-Commerce Demo</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <header>
+        <h1>Toko Online Sederhana</h1>
+        <a href="cart.html" class="cart-link">Keranjang (<span id="cart-count">0</span>)</a>
+    </header>
+
+    <main>
+        <section id="products"></section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
